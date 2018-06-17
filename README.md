@@ -4,3 +4,6 @@ Neural-network designed to provide accurate ticker value projections of prices w
 Written via: Python
 
 Featured libraries: TensorFlow, Numpy, Pandas
+
+Perfomance on data snapshot: 
+![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/performance%20testing.png)
