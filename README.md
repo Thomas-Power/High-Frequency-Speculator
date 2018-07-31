@@ -1,9 +1,9 @@
 # High-Frequency-Speculator
-Neural-network designed to provide accurate ticker value projections of prices within timeframe immediately after transaction duration.
-
+Neural-network designed to provide accurate ticker value projections of prices within specified timeframes immediately after current moment.
 Written via: Python
 
 Featured libraries: TensorFlow, Numpy, Pandas
 
-Perfomance on data snapshot: 
+Perfomance on test data snapshots:
+(test data was naturally seperate from training data)
 ![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/performance%20testing.png)
