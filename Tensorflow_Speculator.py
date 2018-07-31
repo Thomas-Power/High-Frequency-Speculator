@@ -12,26 +12,30 @@ import time
 data_files = os.listdir(r"./Import_Data")
 
 logs_path = 'log_relu/'
-batch_count = 100
-learning_rate = 0.0003
-training_epochs = 100
+batch_count = 10
+learning_rate = 0.00003
+training_epochs = 10000
 display_epoch = 1
 
+batch_size = 30
+max_generations = 5
+
+
 #create arrays to fill with feed data
-Projection_Value = np.ones([30], dtype=float)
-Hist_Source = np.ones([30], dtype=float)
-batch_x = np.ones([(batch_count), 30], dtype=float)
-batch_y = np.ones([(batch_count)], dtype=float)
+Projection_Value = np.zeros([batch_size], dtype=float)
+Hist_Source = np.zeros([batch_size], dtype=float)
+batch_x = np.zeros([(batch_count), batch_size], dtype=float)
+batch_y = np.zeros([(batch_count)], dtype=float)
 
 #Create batch_pool. Data to be fed into neural network
-def createBatch():
+def createBatch(gen):
 	Source_Path = "./Import_Data/" + data_files[random.randint(0, (len(data_files)-1))]
 	
 	#import csv data as dataframe
 	Source_Data = pd.read_csv(Source_Path, header=0)
 	
 	#Isolate opening value column
-	Source_Data = Source_Data["O"]
+	Source_Data = Source_Data["Open"]
 	
 	#scale data between -1 and 1
 	scaler = MinMaxScaler(feature_range=(-1, 1))
@@ -40,11 +44,15 @@ def createBatch():
 	Source_Data = scaler.transform(Source_Data)
 
 	for i in range(batch_count):
-		T = random.randint(30, len(Source_Data)-13)				# pick random point for T
+		gen_num = gen
+		data_range = batch_size * gen_num
+		max_range = (len(Source_Data) - (12 * max_generations)) - 1
+		T = random.randint(data_range, max_range)				# pick random point for T
 		T_Vector = Source_Data[T]								# Get vector for T
-		Hist_Price = Source_Data[(T-30) : T]					# gather 30 points before T as Historical data
-		Target = Source_Data[T + random.randint(6, 12)]			# randomly pick T + [6-12] as target value
-		for e in range(30):
+		Hist_Range = Source_Data[(T-data_range) : T]			# gather 30 points per generation before T as Historical data
+		Hist_Price = Hist_Range[0::gen_num]						# isolate 30 points within that range
+		Target = Source_Data[T + (gen_num * 6 + ( random.randint(0, 6)))]			# randomly pick T + [6-12] as target value
+		for e in range(batch_size):
 			Projection_Value[e] = Hist_Price[e]
 
 		batch_x[i] = Projection_Value							#projection data and target now defined as batch_pool[i]
@@ -53,15 +61,16 @@ def createBatch():
 	
 batch_y = np.reshape(batch_y, (-1, 1))
 # Define Neurons per layer
-L = 724
-M = 224
-N = 180
-O = 12
 
-X = tf.placeholder(tf.float32, [None, 30], name='InputData')	 	 # input shape 30*2 value change and time distance
-Y = tf.placeholder(tf.float32, [None, 1], name='InputData')
+L = 768
+M = 256
+N = 128
+O = 64
 
-W1 = tf.Variable(tf.truncated_normal([30, L], stddev=0.1)) 			 # random weights for the hidden layer 1
+X = tf.placeholder(tf.float32, [None, batch_size], name='InputData')	 	 # input shape 30*2 value change and time distance
+Y = tf.placeholder(tf.float32, [None, 1], name='LabelData')
+
+W1 = tf.Variable(tf.truncated_normal([batch_size, L], stddev=0.1)) 	 # random weights for the hidden layer 1
 B1 = tf.Variable(tf.ones([L])) 									 	 # bias vector for layer 1
 Y1 = tf.nn.relu(tf.matmul(X, W1) + B1)  							 # Output from layer 1
 
@@ -90,19 +99,29 @@ summary_op = tf.summary.merge_all()
 init_op = tf.global_variables_initializer()
 
 saver = tf.train.Saver()
-with tf.Session() as sess:
-	sess.run(init_op)																			# run the initializer
-	writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph()) 					# create writer for accuracy logs
+for generation in [3, 5]:
+	with tf.Session() as sess:
+		sess.run(init_op)																			# run the initializer
+		writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph()) 					# create writer for accuracy logs
+		for epoch in range(training_epochs):
+			createBatch(generation)																			# prepare data for input
+			f = batch_count * epoch																	#separates data by epoch
+			for i in range(batch_count):
+				sess.run(train_op, feed_dict={X: batch_x, Y: batch_y})						 		#train data
+				_,summary = sess.run([train_op, summary_op], feed_dict={X: batch_x, Y: batch_y})	#produce summary
+				writer.add_summary(summary, epoch * batch_count + (i+f))							#record summary
+			print("Generation:", generation)
+			print("Epoch: ", epoch)
+			print("Optimization Finished!")
+			print("Accuracy: ", cost_op.eval(feed_dict={X: batch_x, Y: batch_y}))					#print accuracy
+		saver.save(sess, './python_models/gen_' + str(generation) + '/trained_model', global_step=1000)									#save model
 
-	for epoch in range(training_epochs):
-		createBatch()																			# prepare data for input
-		f = batch_count * epoch																	#separates data by epoch
-		for i in range(batch_count):
-			sess.run(train_op, feed_dict={X: batch_x, Y: batch_y})						 		#train data
-			_,summary = sess.run([train_op, summary_op], feed_dict={X: batch_x, Y: batch_y})	#produce summary
-			writer.add_summary(summary, epoch * batch_count + (i+f))							#record summary
-		print("Epoch: ", epoch)
-		print("Optimization Finished!")
-		print("Accuracy: ", cost_op.eval(feed_dict={X: batch_x, Y: batch_y}))					#print accuracy
-	saver.save(sess, './temp/trained_model', global_step=1000)									#save model
-	
+		builder = tf.saved_model.builder.SavedModelBuilder('./java_models/gen_' + str(generation) + '/model')
+		builder.add_meta_graph_and_variables(
+		  sess,
+		  [tf.saved_model.tag_constants.SERVING]
+		)
+		builder.save()
+		sess.close()
+
+		
