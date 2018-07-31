@@ -5,5 +5,6 @@ Written via: Python
 
 Featured libraries: TensorFlow, Numpy, Pandas
 
-Perfomance on data snapshot: 
+Perfomance on test data snapshot:
+(test data was naturally seperate from training data)
 ![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/performance%20testing.png)
