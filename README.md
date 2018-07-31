@@ -13,3 +13,5 @@ Perfomance on test data snapshots:
 ![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/Test%20Graphs/3.png)
 ![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/Test%20Graphs/4.png)
 ![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/Test%20Graphs/5.png)
+
+*Note flatline at beginning of graph represents minimum necessary input range 
