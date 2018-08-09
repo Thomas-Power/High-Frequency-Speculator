@@ -17,7 +17,7 @@ The following graph was used in analyzing maximum mean price deviation:
 
 ![alt text](https://raw.githubusercontent.com/Thomas-Power/High-Frequency-Speculator/master/Test%20Graphs/XBT_mean.png)
 
-The model itself is a feed-forward dense neural network. This description details that data is forward moving through each layer of nodes from the input layer through the hidden layers to the eventual output. From reviewing others working in the area ReLU activation functions are successful in producing results but on my own analysis of results a SeLU function placed at the output layer produced far more accurate results in tests though inferior returns placed elsewhere in the model.
+The model itself is a feed-forward dense neural network. This description details that data is forward moving through each layer of nodes from the input layer through the hidden layers to the eventual output. From reviewing others working in the area ReLU activation functions are successful in producing results for this form of market data but on my own analysis of results a SeLU function placed at the output layer produced far more accurate results in tests though inferior returns placed elsewhere in the model.
 
 Perfomance on test data snapshots:
 (Test data was naturally seperated from training data)
