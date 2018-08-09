@@ -5,7 +5,7 @@ Neural-network designed to provide accurate ticker value projections of prices w
 Python
 
 #### Featured libraries: 
-TensorFlow, Numpy, Pandas
+TensorFlow, Numpy, Pandas, Matplotlib
 
 #### To run: 
 To run test demo simply launch training_NN.py with Tensorflow and appropriate libraries installed.
