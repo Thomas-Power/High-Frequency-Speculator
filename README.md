@@ -1,9 +1,10 @@
 ## Neural-Net-Speculator
 Neural-network designed to provide accurate ticker value projections of prices within specified timeframes immediately after current moment.
-#Written via: 
+
+# Written via: 
 Python
 
-#Featured libraries: 
+# Featured libraries: 
 TensorFlow, Numpy, Pandas
 
 #To run 
