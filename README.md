@@ -1,5 +1,5 @@
 ## Neural-Net-Speculator
-Neural-network designed to provide accurate ticker value projections of prices within specified timeframes immediately after current moment.
+Neural-network designed to provide accurate ticker value projections of prices within specified timeframes.
 
 #### Written via: 
 Python
