@@ -11,7 +11,7 @@ TensorFlow, Numpy, Pandas, Matplotlib
 To run test demo simply launch training_NN.py with Tensorflow and appropriate libraries installed.
 
 #### Design process:
-I was tasked with inventing a procedure by which our trading system could project prices into the future in order to keep track of moving trends on a minute by minute basis. I seen early on machine learning could be an excellent avenue of exploration. Upon reviewing work by others and my own early tests I found promising results to develope further. 
+I was tasked with inventing a procedure by which our trading system could project prices into the future in order to keep track of moving trends on a minute by minute basis. I seen early on machine learning could be an excellent avenue of exploration. Upon reviewing work by others [[1]](https://dashee87.github.io/deep%20learning/python/predicting-cryptocurrency-prices-with-deep-learning/)[[2]](https://medium.com/mlreview/a-simple-deep-learning-model-for-stock-price-prediction-using-tensorflow-30505541d877) and my own early tests I found promising results to develop further. 
 Machine Learning is an ever evolving process of design and many iterations and tests were run until reaching the current version. Problems encountered early on was establishing a uniform means of normalizing input values (the activation functions available in Tensorflow as a rule work best with figures scaled between 0 and 1 or -1 and 1). 
 Heuristic analysis of historical deviation was found to be the most reliable approach. On analyzing the data of the following commodity it was found that a deviation of 3% from the latest 6-hour mean produced reliable and coverage.
 The following graph was used in analyzing maximum mean price deviation:
