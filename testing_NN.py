@@ -12,25 +12,34 @@ import time
 batch_size = 30
 max_generations = 5
 
-gen_num = random.randint(0, (max_generations+1))
+gen_num = random.randint(1, max_generations+1)
 
 #locate Source_Data
 currencies = os.listdir(r"./TestFiles/")
 cur_string = currencies[random.randint(0, (len(currencies)-1))]
 data_files = os.listdir(r"./TestFiles/" + cur_string + "/")
-	
-Source_Path = "./TestFiles/" + cur_string + "/" + data_files[random.randint(0, (len(data_files)-1))]
 
+num = random.randint(1, (len(data_files)-1))
 
-#import csv data as array 
+Source_Path = "./TestFiles/" + cur_string + "/" + data_files[num]
+Scale_Path = "./TestFiles/" + cur_string + "/" + data_files[num-1]
+#import csv data as dataframe
 Source_Data = pd.read_csv(Source_Path, header=0)
 
+Scale_Data = pd.read_csv(Scale_Path, header=0)
+#Isolate opening value column
 Source_Data = Source_Data["open"]
-
+Scale_Data = Scale_Data["open"]
+	
+#scale data between -1 and 1
 scaler = MinMaxScaler(feature_range=(-1, 1))
 Source_Data = np.reshape(Source_Data, (-1, 1))
-scaler.fit(Source_Data)
+scale_mean = Scale_Data.mean()
+scale = [scale_mean * 0.97, scale_mean * 1.03]
+scale = np.reshape(scale, (-1, 1))
+scaler.fit(scale)
 Source_Data = scaler.transform(Source_Data)
+
 data_range = int(batch_size * gen_num)
 max_range = int(len(Source_Data) - (9 * max_generations) - 1)
 target_point = 9 * gen_num
