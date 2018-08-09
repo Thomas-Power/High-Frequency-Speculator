@@ -31,4 +31,4 @@ The model itself is a feed-forward dense neural network. This description detail
 
 *Note flatline at beginning of graph represents minimum necessary input range
 
-All data sourced via Bitmex
+All data sourced via Bitmex[5](https://www.bitmex.com/api/explorer/)
