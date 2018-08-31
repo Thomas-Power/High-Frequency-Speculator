@@ -56,36 +56,37 @@ batch_gen = np.zeros([max_range], dtype=float)
 
 preditions = np.zeros([max_range], dtype=float)
 
-#Create batch_pool. Data to be fed into neural network
-for i in range(data_range, max_range):
-		
-	T = i
-	T_Vector = Source_Data[T]								# Get vector for T
-	Hist_Range = Source_Data[(T-data_range) : T]			# gather 30 points per generation before T as Historical data
-	Hist_Price = Hist_Range[0::gen_num]						# isolate 30 points within that range
-	Target = Source_Data[T + target_point]					# get target value for comparison
-	for e in range(batch_size):
-		Projection_Value[e] = Hist_Price[e]
-		
-	batch_x[i] = Projection_Value # projections and target now defined as batch_pool[i]
-	batch_y[i] = Target
+if __name__ == '__main__':
+	#Create batch_pool. Data to be fed into neural network
+	for i in range(data_range, max_range):
+
+		T = i
+		T_Vector = Source_Data[T]								# Get vector for T
+		Hist_Range = Source_Data[(T-data_range) : T]			# gather 30 points per generation before T as Historical data
+		Hist_Price = Hist_Range[0::gen_num]						# isolate 30 points within that range
+		Target = Source_Data[T + target_point]					# get target value for comparison
+		for e in range(batch_size):
+			Projection_Value[e] = Hist_Price[e]
+
+		batch_x[i] = Projection_Value # projections and target now defined as batch_pool[i]
+		batch_y[i] = Target
 
 
-	
-saver = tf.train.import_meta_graph('./python_models/gen_' + str(gen_num) + '/trained_model-1000.meta')
-with tf.Session() as sess:
-	saver.restore(sess,tf.train.latest_checkpoint('./python_models/gen_' + str(gen_num)))
-	graph = tf.get_default_graph()
-	Y_ = graph.get_tensor_by_name('Output:0')
-	X = graph.get_tensor_by_name('InputData:0')
-	preditions = sess.run(Y_, feed_dict={X: batch_x})
 
-preditions = scaler.inverse_transform(preditions)
-batch_y = scaler.inverse_transform(Source_Data)
-	
-plt.plot(preditions, label="Prediction")
-plt.plot(batch_y, label="Actual Data")
-print(str(gen_num*6) + "-" + str((gen_num*6)+6) + "min projection for " + Source_Path[12:15])
-plt.title(str(gen_num*6) + "-" + str((gen_num*6)+6) + "min projection for " + Source_Path[12:15]) 
-plt.legend()
-plt.show()
+	saver = tf.train.import_meta_graph('./python_models/gen_' + str(gen_num) + '/trained_model-1000.meta')
+	with tf.Session() as sess:
+		saver.restore(sess,tf.train.latest_checkpoint('./python_models/gen_' + str(gen_num)))
+		graph = tf.get_default_graph()
+		Y_ = graph.get_tensor_by_name('Output:0')
+		X = graph.get_tensor_by_name('InputData:0')
+		preditions = sess.run(Y_, feed_dict={X: batch_x})
+
+	preditions = scaler.inverse_transform(preditions)
+	batch_y = scaler.inverse_transform(Source_Data)
+
+	plt.plot(preditions, label="Prediction")
+	plt.plot(batch_y, label="Actual Data")
+	print(str(gen_num*6) + "-" + str((gen_num*6)+6) + "min projection for " + Source_Path[12:15])
+	plt.title(str(gen_num*6) + "-" + str((gen_num*6)+6) + "min projection for " + Source_Path[12:15]) 
+	plt.legend()
+	plt.show()
