@@ -112,28 +112,30 @@ summary_op = tf.summary.merge_all()
 init_op = tf.global_variables_initializer()
 
 saver = tf.train.Saver()
-for generation in range(1, max_generations+1):
-	with tf.Session() as sess:
-		sess.run(init_op)																			# run the initializer
-		writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph()) 					# create writer for accuracy logs
-		for epoch in range(training_epochs):
-			createBatch(generation)																			# prepare data for input																	#separates data by epoch
-			for i in range(batch_size):
-				sess.run(train_op, feed_dict={X: batch_x, Y: batch_y})						 		#train data
-				_,summary = sess.run([train_op, summary_op], feed_dict={X: batch_x, Y: batch_y})	#produce summary
-				writer.add_summary(summary, epoch * batch_size + i)									#record summary
-			print("Generation:", generation)
-			print("Epoch: ", epoch)
-			print("Optimization Finished!")
-			print("Accuracy: ", cost_op.eval(feed_dict={X: batch_x, Y: batch_y}))					#print accuracy
-		saver.save(sess, './python_models/gen_' + str(generation) + '/trained_model', global_step=1000)									#save model
 
-		builder = tf.saved_model.builder.SavedModelBuilder('./java_models/gen_' + str(generation) + '/model')
-		builder.add_meta_graph_and_variables(
-		  sess,
-		  [tf.saved_model.tag_constants.SERVING]
-		)
-		builder.save()
-		sess.close()
+if __name__ == '__main__':
+	for generation in range(1, max_generations+1):
+		with tf.Session() as sess:
+			sess.run(init_op)																			# run the initializer
+			writer = tf.summary.FileWriter(logs_path, graph=tf.get_default_graph()) 					# create writer for accuracy logs
+			for epoch in range(training_epochs):
+				createBatch(generation)																			# prepare data for input																	#separates data by epoch
+				for i in range(batch_size):
+					sess.run(train_op, feed_dict={X: batch_x, Y: batch_y})						 		#train data
+					_,summary = sess.run([train_op, summary_op], feed_dict={X: batch_x, Y: batch_y})	#produce summary
+					writer.add_summary(summary, epoch * batch_size + i)									#record summary
+				print("Generation:", generation)
+				print("Epoch: ", epoch)
+				print("Optimization Finished!")
+				print("Accuracy: ", cost_op.eval(feed_dict={X: batch_x, Y: batch_y}))					#print accuracy
+			saver.save(sess, './python_models/gen_' + str(generation) + '/trained_model', global_step=1000)									#save model
+
+			builder = tf.saved_model.builder.SavedModelBuilder('./java_models/gen_' + str(generation) + '/model')
+			builder.add_meta_graph_and_variables(
+			  sess,
+			  [tf.saved_model.tag_constants.SERVING]
+			)
+			builder.save()
+			sess.close()
 
 		
